@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite App</title>
+  </head>
+  <body>
+    <main class="wrapper">
+      <section class="container">
+        <!-- tarjetas -->
+        <div class="container__cards">
+          <div class="card-front">
+            <img src="bg-card-front.png" alt="bg-card-front" />
+            <div class="card-front__info">
+              <header><img src="card-logo.svg" alt="card-logo" /></header>
+              <div>
+                <p>0000 0000 0000 0000</p>
+                <div class="card-front__date">
+                  <strong>Jane Appleseed</strong>
+                  <span> 00/00 </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-back">
+            <img src="bg-card-back.png" alt="bg-card-back" />
+            <p class="card-back__number">000</p>
+          </div>
+        </div>
+        <!-- form -->
+        <div>
+          <form action="" class="form">
+            <!-- input 1 -->
+            <div>
+              <label for="card-name">Cardholder Name</label>
+              <input
+                type="text"
+                placeholder="e.g. Jane Appleseed"
+                class="form__input"
+                id="name"
+              />
+            </div>
+            <!-- input 2 -->
+            <div>
+              <label for="card-number">Card Number</label>
+              <input
+                type="text"
+                placeholder="e.g. 1234 5678 9123 0000"
+                class="form__input"
+                id="card-number"
+              />
+            </div>
+            <!-- input 3  -->
+            <div class="form__box-three">
+              <div>
+                <label for="card-date">Exp. Date (MM/YY)</label>
+                <div class="form__date">
+                  <input
+                    type="text"
+                    placeholder="MM"
+                    class="form__input"
+                    id="card-date"
+                  />
+                  <input
+                    type="text"
+                    placeholder="YY"
+                    class="form__input"
+                    id="card-date"
+                  />
+                </div>
+              </div>
+              <div>
+                <label for="card-cvc">CVC</label>
+                <input
+                  type="text"
+                  placeholder="e.g. 123"
+                  class="form__input"
+                  id="card-cvc"
+                />
+              </div>
+            </div>
+            <input type="submit" class="form__submit" value="Confirm" />
+          </form>
+        </div>
+      </section>
+      <!-- Completed state start -->
+
+      Thank you! We've added your card details Continue
+    </main>
+
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
