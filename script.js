@@ -5,14 +5,17 @@ const $inputYear = document.getElementById('card-year');
 const $inputCvc = document.getElementById('card-cvc');
 
 const $form = document.getElementById('form');
-const $send = document.getElementById('send');
-const $container = document.getElementById('container-form');
+
+const $sendContainer = document.getElementById('container-send');
+const $containerForm = document.getElementById('container-form');
 
 const $cardElementName = document.getElementById('card-element-name');
 const $cardElementNumber = document.getElementById('card-element-number');
 const $cardElementMonth = document.getElementById('card-element-month');
 const $cardElementYear = document.getElementById('card-element-year');
 const $cardElementCvc = document.getElementById('card-element-cvc');
+
+const $btnContinue = document.getElementById('btn-continue');
 
 /* ---------------------- Funciones de Utilidad ---------------------- */
 // comprobar que ningun campo esté vacio
@@ -21,7 +24,8 @@ const isRequired = (value) => {
 };
 // comprobar que los campos solo acepten numeros
 const isNumber = (value) => {
-  const pattern = /^[0-9]+$/;
+  // const pattern = /^[0-9]+$/;
+  const pattern = /^[0-9\s]+$/;
   return pattern.test(value);
 };
 // comprobar que el nombre solo acepte letras
@@ -29,11 +33,13 @@ const isWord = (value) => {
   const pattern = /^[A-Za-z\s'-\.]+$/;
   return pattern.test(value);
 };
+// comprobar si esta en el rango establecido
+const isBetween = (length, min, max) => {
+  return length < min || length > max ? false : true;
+};
 // comprobar que acepte solo la cantidad necesaria de números
-// const isBetween = (length, min, max) => {
-//   return length < min || length > max ? false : true;
-// };
-const isBetween = (length, number) => {
+
+const isEquals = (length, number) => {
   return length != number ? false : true;
 };
 // mostrar y remover mensaje de error
@@ -71,9 +77,9 @@ const checkUsername = () => {
   return false;
 };
 // validar todos los input que acepten numeros
-const checkNumbers = (input, numberRange, message) => {
+const checkNumbers = (input, numberEquals, message) => {
   const CardNumber = input.value.trim();
-  const number = numberRange;
+  const number = numberEquals;
   switch (true) {
     case !isRequired(CardNumber):
       showError(input, "can't be blank");
@@ -81,7 +87,7 @@ const checkNumbers = (input, numberRange, message) => {
     case !isNumber(CardNumber):
       showError(input, 'Wrong format,numbers only');
       break;
-    case !isBetween(CardNumber.length, number):
+    case !isEquals(CardNumber.length, number):
       showError(input, message);
       break;
     default:
@@ -90,6 +96,27 @@ const checkNumbers = (input, numberRange, message) => {
   }
   return false;
 };
+const checkNumbersDate = (input, numberMin, numberMax, message) => {
+  const cardNumberDate = input.value.trim();
+  let min = numberMin;
+  let max = numberMax;
+  switch (true) {
+    case !isRequired(cardNumberDate):
+      showError(input, "can't be blank");
+      break;
+    case !isNumber(cardNumberDate):
+      showError(input, 'Wrong format,numbers only');
+      break;
+    case !isBetween(+cardNumberDate, min, max):
+      showError(input, message);
+      break;
+    default:
+      removeError(input);
+      return true;
+  }
+  return false;
+};
+/* ----------- Funciones para eventos ----------- */
 // evento submit
 const formEvent = (event) => {
   event.preventDefault();
@@ -97,18 +124,15 @@ const formEvent = (event) => {
   let isNameValid = checkUsername();
   let isCardNumberValid = checkNumbers(
     $inputCardNumber,
-    16,
+    19,
     'Wrong format, 16-digit number required'
   );
-  let isMonthValid = checkNumbers(
-    $inputMonth,
-    2,
-    'Wrong format, 2-digit number required'
-  );
-  let isYearValid = checkNumbers(
+  let isMonthValid = checkNumbersDate($inputMonth, 1, 12, 'numbers to 1-12');
+  let isYearValid = checkNumbersDate(
     $inputYear,
-    2,
-    'Wrong format, 2-digit number required'
+    23,
+    27,
+    'years from 2023-2027(23-27)'
   );
   let isCvcValid = checkNumbers(
     $inputCvc,
@@ -124,33 +148,62 @@ const formEvent = (event) => {
     isCvcValid;
 
   if (isFormCardValid) {
-    $container.hidden = true;
-    $send.style.display = 'flex';
+    $containerForm.hidden = true;
+    $sendContainer.style.display = 'flex';
+    $form.reset();
   }
-  $form.reset();
 };
 // eventos input
-const inputEvent = (cardElement, inputValue) => {
-  cardElement.textContent = inputValue.value;
+const inputEvent = (cardElement, inputValue, numStart, numEnd) => {
+  // cardElement.textContent = inputValue.value.substring(numStar, numEnd);
+  const value = inputValue.value.trim();
+  const formattedValue = value.replace(/\s/g, '');
+  const subValue = formattedValue.substring(0, numEnd - numStart);
+  cardElement.textContent = subValue;
+  inputValue.value = subValue;
 };
+/* ----------- Funcion padre que sera exportada ----------- */
 const interactiveCard = () => {
   $form.addEventListener('submit', formEvent);
   $inputName.addEventListener('input', () => {
-    inputEvent($cardElementName, $inputName);
+    checkUsername();
+    $cardElementName.textContent = $inputName.value;
   });
   $inputCardNumber.addEventListener('input', () => {
-    inputEvent($cardElementNumber, $inputCardNumber);
+    const formattedValue = $inputCardNumber.value
+      .replace(/\s/g, '')
+      .replace(/(\d{4})/g, '$1 ')
+      .substring(0, 19);
+    $inputCardNumber.value = formattedValue.trim();
+    $cardElementNumber.textContent = formattedValue.trim();
+    checkNumbers(
+      $inputCardNumber,
+      19,
+      'Wrong format, 16-digit number required'
+    );
   });
   $inputMonth.addEventListener('input', () => {
-    inputEvent($cardElementMonth, $inputMonth);
+    checkNumbersDate($inputMonth, 1, 12, 'numbers to 1-12');
+    inputEvent($cardElementMonth, $inputMonth, 0, 2);
   });
   $inputYear.addEventListener('input', () => {
-    inputEvent($cardElementYear, $inputYear);
+    checkNumbersDate($inputYear, 23, 27, 'years from 2023-2027(23-27)');
+    inputEvent($cardElementYear, $inputYear, 0, 2);
   });
   $inputCvc.addEventListener('input', () => {
-    inputEvent($cardElementCvc, $inputCvc);
+    inputEvent($cardElementCvc, $inputCvc, 0, 3);
+    checkNumbers($inputCvc, 3, 'Wrong format, 3-digit number required');
+  });
+  $btnContinue.addEventListener('click', () => {
+    $containerForm.hidden = false;
+    $sendContainer.style.display = 'none';
+
+    $cardElementName.textContent = 'Jane Appleseed';
+    $cardElementNumber.textContent = '0000 0000 0000 0000';
+    $cardElementMonth.textContent = '00';
+    $cardElementYear.textContent = '00';
+    $cardElementCvc.textContent = '000';
   });
 };
 
 export { interactiveCard };
-// TODO: falta separar los numeros de las tajetas,validar las fechas que no exedan y validar el mes que puede ser un valor o dos no exactamente igual
