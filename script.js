@@ -155,16 +155,16 @@ const formEvent = (event) => {
 };
 // eventos input
 const inputEvent = (cardElement, inputValue, numStart, numEnd) => {
-  // cardElement.textContent = inputValue.value.substring(numStar, numEnd);
   const value = inputValue.value.trim();
-  const formattedValue = value.replace(/\s/g, '');
-  const subValue = formattedValue.substring(0, numEnd - numStart);
+  const subValue = value.substring(numStart, numEnd);
   cardElement.textContent = subValue;
   inputValue.value = subValue;
 };
 /* ----------- Funcion padre que sera exportada ----------- */
 const interactiveCard = () => {
+  // evento submit si todo va correcto
   $form.addEventListener('submit', formEvent);
+  // eventos para cada input
   $inputName.addEventListener('input', () => {
     checkUsername();
     $cardElementName.textContent = $inputName.value;
@@ -194,6 +194,7 @@ const interactiveCard = () => {
     inputEvent($cardElementCvc, $inputCvc, 0, 3);
     checkNumbers($inputCvc, 3, 'Wrong format, 3-digit number required');
   });
+  // evento click para volver al inicio liego de pasar el submit event
   $btnContinue.addEventListener('click', () => {
     $containerForm.hidden = false;
     $sendContainer.style.display = 'none';
