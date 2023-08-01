@@ -167,7 +167,7 @@ const interactiveCard = () => {
   // eventos para cada input
   $inputName.addEventListener('input', () => {
     checkUsername();
-    $cardElementName.textContent = $inputName.value;
+    $cardElementName.textContent = $inputName.value.toUpperCase();
   });
   $inputCardNumber.addEventListener('input', () => {
     const formattedValue = $inputCardNumber.value
