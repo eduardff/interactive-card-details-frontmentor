@@ -160,41 +160,60 @@ const inputEvent = (cardElement, inputValue, numStart, numEnd) => {
   cardElement.textContent = subValue;
   inputValue.value = subValue;
 };
+// funcion debounce para determinar el tiempo de muestra del mensaje de error
+const debounce = (fn, delay = 500) => {
+  let timeoutId;
+  return (...args) => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    timeoutId = setTimeout(() => {
+      fn.apply(null, args);
+    }, delay);
+  };
+};
 /* ----------- Funcion padre que sera exportada ----------- */
 const interactiveCard = () => {
   // evento submit si todo va correcto
   $form.addEventListener('submit', formEvent);
-  // eventos para cada input
-  $inputName.addEventListener('input', () => {
-    checkUsername();
-    $cardElementName.textContent = $inputName.value.toUpperCase();
-  });
-  $inputCardNumber.addEventListener('input', () => {
-    const formattedValue = $inputCardNumber.value
-      .replace(/\s/g, '')
-      .replace(/(\d{4})/g, '$1 ')
-      .substring(0, 19);
-    $inputCardNumber.value = formattedValue.trim();
-    $cardElementNumber.textContent = formattedValue.trim();
-    checkNumbers(
-      $inputCardNumber,
-      19,
-      'Wrong format, 16-digit number required'
-    );
-  });
-  $inputMonth.addEventListener('input', () => {
-    checkNumbersDate($inputMonth, 1, 12, 'numbers to 1-12');
-    inputEvent($cardElementMonth, $inputMonth, 0, 2);
-  });
-  $inputYear.addEventListener('input', () => {
-    checkNumbersDate($inputYear, 23, 27, 'years from 2023-2027(23-27)');
-    inputEvent($cardElementYear, $inputYear, 0, 2);
-  });
-  $inputCvc.addEventListener('input', () => {
-    inputEvent($cardElementCvc, $inputCvc, 0, 3);
-    checkNumbers($inputCvc, 3, 'Wrong format, 3-digit number required');
-  });
-  // evento click para volver al inicio liego de pasar el submit event
+
+  $form.addEventListener(
+    'input',
+    debounce((event) => {
+      let target = event.target.id;
+      switch (target) {
+        case 'name':
+          checkUsername();
+          $cardElementName.textContent = $inputName.value.toUpperCase();
+          break;
+        case 'card-number':
+          const formattedValue = $inputCardNumber.value
+            .replace(/\s/g, '')
+            .replace(/(\d{4})/g, '$1 ')
+            .substring(0, 19);
+          $inputCardNumber.value = formattedValue.trim();
+          $cardElementNumber.textContent = formattedValue.trim();
+          checkNumbers(
+            $inputCardNumber,
+            19,
+            'Wrong format, 16-digit number required'
+          );
+          break;
+        case 'card-month':
+          checkNumbersDate($inputMonth, 1, 12, 'numbers to 1-12');
+          inputEvent($cardElementMonth, $inputMonth, 0, 2);
+          break;
+        case 'card-year':
+          checkNumbersDate($inputYear, 23, 27, 'years from 2023-2027(23-27)');
+          inputEvent($cardElementYear, $inputYear, 0, 2);
+          break;
+        case 'card-cvc':
+          inputEvent($cardElementCvc, $inputCvc, 0, 3);
+          checkNumbers($inputCvc, 3, 'Wrong format, 3-digit number required');
+          break;
+      }
+    })
+  );
   $btnContinue.addEventListener('click', () => {
     $containerForm.hidden = false;
     $sendContainer.style.display = 'none';
@@ -208,3 +227,5 @@ const interactiveCard = () => {
 };
 
 export { interactiveCard };
+
+// NOTA:  Si Alguien desea que le explique mi solución puede escribirme a eduardflores.f@hotmail.com
